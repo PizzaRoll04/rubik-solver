@@ -1,4 +1,3 @@
-from visual3D import VisualCube
 from cube_2x2x2 import Cube
 import numpy as np
 import time
@@ -30,44 +29,73 @@ class Node:
                 h += (4 - list(face).count("Y"))
         return h/4
 
+class RubikSolver:
+    # def __init__(self):
+    #     F = np.array(["G"]*4)
+    #     B = np.array(["B"]*4)
+    #     R = np.array(["R"]*4)
+    #     L = np.array(["O"]*4)
+    #     U = np.array(["W"]*4)
+    #     D = np.array(["Y"]*4)
 
-def cube_solver(cube):
-    frontier = [Node(cube, 0, ["START"])]
-    visited = []
-    opposite = {"B": "F", "L": "R", "D": "U"}
-    while(frontier):
-        min_f = 100000
-        index = None
-        for i in range(len(frontier)):
-            # select best node in frontier
-            f = frontier[i].g + frontier[i].h
-            if f < min_f:
-                min_f = f
-                index = i
-        # remove and return node from frontier
-        node = frontier.pop(index)
-        if node.g <= 11:
-            #print(min_f, node.g, min_f - node.g)
-            if node not in visited:
-                visited.append(node)
-                # goal test
-                if node.cube.solved:
-                    return node.sequence
-                # expand node and update frontier
-                moves = node.cube.apply_all_moves()
-                old_move = node.sequence[-1]
-                for move, cube in moves.items():
-                    # prune moves on same face twice in a row
-                    if move[0] != old_move[0]:
-                        # prune moves on opposite face
-                        if old_move[0] in opposite.keys():
-                            if opposite[old_move[0]] != move[0]:
+    #     # cube definition
+    #     self.cube = Cube(F, B, R, L, U, D)
+
+    def generate_scramble():
+        scramble_min = 4
+        scramble_max = 11
+        scramble_len = int(4 + (scramble_max - scramble_min) * np.random.rand())
+        moves = ["F", "F'", "F2", "B", "B'", "B2", "R", "R'", "R2", "L", "L'", "L2", "U", "U'", "U2", "D", "D'", "D2"]
+        return [moves[int(np.random.rand()*(len(moves)-1))] for _ in range(scramble_len)]
+
+    def cube_solver(cube):
+        frontier = [Node(cube, 0, ["START"])]
+        visited = []
+        opposite = {"B": "F", "L": "R", "D": "U"}
+        while(frontier):
+            min_f = 100000
+            index = None
+            for i in range(len(frontier)):
+                # select best node in frontier
+                f = frontier[i].g + frontier[i].h
+                if f < min_f:
+                    min_f = f
+                    index = i
+            # remove and return node from frontier
+            node = frontier.pop(index)
+            if node.g <= 11:
+                #print(min_f, node.g, min_f - node.g)
+                if node not in visited:
+                    visited.append(node)
+                    # goal test
+                    if node.cube.solved:
+                        return node.sequence[1:]
+                    # expand node and update frontier
+                    moves = node.cube.apply_all_moves()
+                    old_move = node.sequence[-1]
+                    for move, cube in moves.items():
+                        # prune moves on same face twice in a row
+                        if move[0] != old_move[0]:
+                            # prune moves on opposite face
+                            if old_move[0] in opposite.keys():
+                                if opposite[old_move[0]] != move[0]:
+                                    frontier.append(Node(cube, node.g + 1, node.sequence + [move]))
+                            else:
                                 frontier.append(Node(cube, node.g + 1, node.sequence + [move]))
-                        else:
-                            frontier.append(Node(cube, node.g + 1, node.sequence + [move]))
 
 
 if __name__ == "__main__":
+    # solver = RubikSolver()
+    # scramble = solver.generate_scramble()
+    # print(scramble)
+    # solver.cube.print_cube()
+    # solver.apply_sequence(scramble)
+    # solver.cube.print_cube()
+    # solution = solver.cube_solver()
+    # solver.apply_sequence(solution)
+    # print(solver.cube.check_solved())
+    # print(solution)
+    exit()
 
     F = np.array(["G"]*4)
     B = np.array(["B"]*4)
